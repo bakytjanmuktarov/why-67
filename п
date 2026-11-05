@@ -1,0 +1,168 @@
+Этот код реализует интерактивность для вашего сайта-портфолио. Он разбит на три независимые части (модуля):
+
+Переключение светлой и темной темы с сохранением выбора в localStorage.
+
+Модальное окно (попап) для отображения подробной информации о проектах при клике на карточки.
+
+Слайдер (галерея) для переключения фотографий вперед и назад с отображением счетчика.
+
+Давайте разберем каждую часть подробно и по шагам.
+
+Часть 1. Переключение темы (Светлая / Темная)
+JavaScript
+const themeBtn = document.querySelector('.theme-btn');
+
+function setTheme(isDark) {
+  if (isDark) {
+    document.body.classList.add('dark');
+    themeBtn.textContent = '☀️';
+  } else {
+    document.body.classList.remove('dark');
+    themeBtn.textContent = '🌙';
+  }
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+
+// Устанавливаем тему при загрузке страницы
+setTheme(localStorage.getItem('theme') === 'dark');
+
+// Обработчик клика по кнопке смены темы
+themeBtn.addEventListener('click', function () {
+  const isDarkNow = document.body.classList.contains('dark');
+  setTheme(!isDarkNow);
+});
+const themeBtn = document.querySelector('.theme-btn'); — находим в HTML кнопку переключения темы по ее классу .theme-btn.
+
+Функция setTheme(isDark):
+
+Принимает логическое значение isDark (true, если нужна темная тема, и false, если светлая).
+
+Если isDark равен true, то к тегу <body> добавляется класс dark (в CSS для этого класса прописаны темные цвета), а иконка кнопки меняется на солнце (☀️), чтобы пользователь мог переключиться обратно в светлый режим.
+
+Если isDark равен false, класс dark удаляется, а иконка меняется на луну (🌙).
+
+localStorage.setItem(...) сохраняет выбор пользователя в памяти браузера. Даже если пользователь перезагрузит страницу или закроет вкладку, сайт запомнит его предпочтение.
+
+setTheme(localStorage.getItem('theme') === 'dark'); — эта строка проверяет, что было сохранено в localStorage ранее. Если там записана строка 'dark', выражение вернет true, и сайт откроется в темной теме. Иначе — в светлой.
+
+Слушатель клика (addEventListener): при клике на кнопку скрипт проверяет, есть ли прямо сейчас класс dark у <body>, и инвертирует это значение (setTheme(!isDarkNow)), переключая тему на противоположную.
+
+Часть 2. Модальное окно для проектов
+JavaScript
+const modal = document.querySelector('#modal');
+if (modal) {
+  const modalImg = document.querySelector('#modal-img');
+  const modalTitle = document.querySelector('#modal-title');
+  const modalText = document.querySelector('#modal-text');
+  const modalLink = document.querySelector('#modal-link');
+  const closeBtn = document.querySelector('#modal-close');
+  const card1 = document.querySelector('#card1');
+  const card2 = document.querySelector('#card2');
+
+  card1.addEventListener('click', function (event) {
+    event.preventDefault(); 
+    modalImg.src = 'img/Gemini_Generated_Image_gt53rlgt53rlgt53.png';
+    modalImg.className = 'modal-img';
+    modalTitle.textContent = 'This portfolio';
+    modalText.textContent = 'My personal portfolio website. Made with HTML, CSS and JavaScript.';
+    modalLink.style.display = 'none';
+    modal.classList.add('open'); 
+  });
+
+  card2.addEventListener('click', function (event) {
+    event.preventDefault();
+    modalImg.src = 'img/image.png';
+    modalImg.className = 'modal-img contain'; 
+    modalTitle.textContent = 'Handtalk';
+    modalText.textContent = 'HandTalk: translating sign into speech and text.';
+    modalLink.href = 'https://drive.google.com/drive/folders/1xpKQ9mWrRmGW_sbAQ3_jnDmSbVok6qne';
+    modalLink.style.display = 'inline-block';
+    modal.classList.add('open');
+  });
+
+  closeBtn.addEventListener('click', function () {
+    modal.classList.remove('open');
+  });
+}
+Проверка if (modal): код выполнится только в том случае, если на текущей странице есть элемент с id="modal". Это защищает от ошибок на страницах, где модального окна нет.
+
+Поиск элементов модалки: заранее находим все внутренности окна (картинку, заголовок, текст, ссылку, кнопку закрытия) и сами карточки проектов (card1, card2).
+
+Клик по первой карточке (card1):
+
+event.preventDefault(); — отменяет стандартное поведение браузера (например, если карточка является ссылкой <a>, страница не станет перенаправляться по адресу).
+
+Динамически заполняет модальное окно данными первого проекта: меняет картинку, заголовок, текст.
+
+modalLink.style.display = 'none'; — скрывает кнопку-ссылку, так как для этого проекта она не нужна.
+
+modal.classList.add('open'); — добавляет класс open к модальному окну, заставляя его появиться на экране (обычно в CSS прописано opacity: 1; pointer-events: auto; или display: flex;).
+
+Клик по второй карточке (card2):
+
+Делает то же самое, но подставляет данные проекта «Handtalk».
+
+Добавляет класс contain для картинки (modalImg.className = 'modal-img contain';), что полезно, если картинка имеет другие пропорции и должна вписываться целиком (через CSS-свойство object-fit: contain).
+
+Устанавливает реальную ссылку на Google Drive (modalLink.href = ...) и включает её отображение (modalLink.style.display = 'inline-block';).
+
+Клик по кнопке закрытия (closeBtn):
+
+Удаляет класс open у модального окна (modal.classList.remove('open');), скрывая его обратно.
+
+Часть 3. Слайдер (Фотогалерея)
+JavaScript
+const galleryImg = document.querySelector('#gallery-img');
+if (galleryImg) {
+  const galleryCount = document.querySelector('#gallery-count');
+  const prevBtn = document.querySelector('#gallery-prev');
+  const nextBtn = document.querySelector('#gallery-next');
+  const photos = [
+    'img/WhatsApp Image 2026-11-05 at 09.12.27.jpeg', 
+    'img/seci.jpeg', 
+    'img/WhatsApp Image 2026-11-05 at 09.12.28.jpeg'
+  ];
+  let current = 0; 
+
+  nextBtn.addEventListener('click', function () {
+    current = current + 1;
+    if (current === photos.length) {
+      current = 0
+    }
+    galleryImg.src = photos[current];
+    galleryCount.textContent = (current + 1) + ' / ' + photos.length;
+  });
+
+  prevBtn.addEventListener('click', function () {
+    current = current - 1;
+    if (current < 0) {
+      current = photos.length - 1;
+    }
+    galleryImg.src = photos[current];
+    galleryCount.textContent = (current + 1) + ' / ' + photos.length;
+  });
+}
+Массив photos: содержит пути к трем картинкам, которые будут листаться в галерее.
+
+Переменная let current = 0;: индекс текущей отображаемой фотографии (начинается с 0, то есть с первой картинки в массиве).
+
+Кнопка «Вперед» (nextBtn):
+
+Увеличивает current на 1 (current = current + 1).
+
+Если current доходит до конца массива (photos.length, то есть стало равно 3), индекс сбрасывается в 0, обеспечивая цикличность (после последней картинки снова идет первая).
+
+Меняет src картинки на новый элемент массива и обновляет счетчик (например, 2 / 3).
+
+Кнопка «Назад» (prevBtn):
+
+Уменьшает current на 1.
+
+Если current становится меньше 0, индекс переносится на самый конец массива (photos.length - 1, то есть на последнюю картинку).
+
+Меняет картинку и обновляет текст счетчика.
+
+Общие рекомендации по коду:
+Код написан чисто, логически разделен на блоки.
+
+Использование проверок if (modal) и if (galleryImg) предотвращает появление красных ошибок в консоли браузера на тех страницах сайта, где этих элементов нет.
